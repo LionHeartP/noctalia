@@ -1,3 +1,4 @@
+#include "compositors/hyprland/hyprland_config_backend.h"
 #include "compositors/hyprland/hyprland_workspace_backend.h"
 
 #include "core/log.h"
@@ -118,7 +119,12 @@ void HyprlandWorkspaceBackend::activate(const std::string& id) {
   }
 
   std::string response;
-  (void)sendRequest(std::format("dispatch workspace {}", id), response);
+  std::string cmd;
+  if (compositors::hyprland::isLua())
+      cmd = std::format("/dispatch hl.dsp.focus({{ workspace = '{}' }})", id);
+  else
+      cmd = std::format("dispatch workspace {}", id);
+  (void)sendRequest(cmd, response);
 }
 
 void HyprlandWorkspaceBackend::activateForOutput(wl_output* /*output*/, const std::string& id) { activate(id); }

@@ -1,6 +1,7 @@
 #include "shell/session/session_panel.h"
 
 #include "compositors/compositor_detect.h"
+#include "compositors/hyprland/hyprland_config_backend.h"
 #include "config/config_service.h"
 #include "core/log.h"
 #include "core/process.h"
@@ -56,7 +57,10 @@ namespace {
 
     switch (compositor) {
     case compositors::CompositorKind::Hyprland:
-      return process::launchFirstAvailable({{"hyprctl", "dispatch", "exit"}});
+      if (compositors::hyprland::isLua())
+        return process::launchFirstAvailable({{"hyprctl", "dispatch", "hl.dsp.exit()"}});
+      else
+        return process::launchFirstAvailable({{"hyprctl", "dispatch", "exit"}});
     case compositors::CompositorKind::Sway:
       return process::launchFirstAvailable({{"swaymsg", "exit"}, {"i3-msg", "exit"}});
     case compositors::CompositorKind::Niri:
